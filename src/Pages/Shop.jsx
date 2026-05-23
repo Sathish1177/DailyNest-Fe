@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { Search, Heart, Star, ShoppingCart, SlidersHorizontal, ArrowUpDown } from "lucide-react";
+import { Search, Heart, Star, ShoppingCart, SlidersHorizontal, ArrowUpDown, Bell, Mail } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import Button from "../components/Button";
 import Toast from "../components/Toast";
+import Modal from "../components/Modal";
+import InputBox from "../components/InputBox";
 import API from "../utils/api";
 import { CartContext } from "../context/CartContext";
 
@@ -12,6 +14,28 @@ const Shop = () => {
   const { addToCart, toggleWishlist, isInWishlist } = useContext(CartContext);
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+
+  // Coming soon notification
+  const [isNotifyOpen, setIsNotifyOpen] = useState(false);
+  const [notifyEmail, setNotifyEmail] = useState("");
+  const [notifyProdName, setNotifyProdName] = useState("");
+
+  const openNotifyModal = (productName) => {
+    setNotifyProdName(productName);
+    setIsNotifyOpen(true);
+  };
+
+  const handleNotifySubmit = (e) => {
+    e.preventDefault();
+    if (notifyEmail.trim()) {
+      setIsNotifyOpen(false);
+      setToast({
+        type: "success",
+        message: `Notification saved! We will notify you when ${notifyProdName} launches.`
+      });
+      setNotifyEmail("");
+    }
+  };
 
   // Search details
   const [products, setProducts] = useState([]);
@@ -332,22 +356,40 @@ const Shop = () => {
 
                       {/* Pricing and Cart button */}
                       <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-50">
-                        <div>
-                          <span className="font-extrabold text-base text-[#111827]">Rs. {prod.discountPrice || prod.price}</span>
-                          {prod.discountPrice && (
-                            <span className="text-xs text-gray-400 line-through ml-1.5">Rs. {prod.price}</span>
-                          )}
-                        </div>
-                        <Button
-                          onClick={() => {
-                            addToCart(prod, 1);
-                            setToast({ type: "success", message: "Added to shopping cart!" });
-                          }}
-                          variant="primary"
-                          size="sm"
-                        >
-                          Add to Cart
-                        </Button>
+                        {prod.isComingSoon ? (
+                          <>
+                            <div>
+                              <span className="font-extrabold text-base text-amber-600">Price TBA</span>
+                            </div>
+                            <Button
+                              onClick={() => openNotifyModal(prod.name)}
+                              variant="accent"
+                              size="sm"
+                              className="bg-amber-500 hover:bg-amber-600 border-0 text-white"
+                            >
+                              Notify Me
+                            </Button>
+                          </>
+                        ) : (
+                          <>
+                            <div>
+                              <span className="font-extrabold text-base text-[#111827]">Rs. {prod.discountPrice || prod.price}</span>
+                              {prod.discountPrice && (
+                                <span className="text-xs text-gray-400 line-through ml-1.5">Rs. {prod.price}</span>
+                              )}
+                            </div>
+                            <Button
+                              onClick={() => {
+                                addToCart(prod, 1);
+                                setToast({ type: "success", message: "Added to shopping cart!" });
+                              }}
+                              variant="primary"
+                              size="sm"
+                            >
+                              Add to Cart
+                            </Button>
+                          </>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -399,6 +441,32 @@ const Shop = () => {
 
         </div>
       </main>
+
+      {/* Coming Soon Notification Modal */}
+      <Modal isOpen={isNotifyOpen} onClose={() => setIsNotifyOpen(false)} title="Notify Me">
+        <form onSubmit={handleNotifySubmit} className="space-y-4">
+          <p className="text-sm text-gray-500">
+            Submit your email or mobile contact. We'll alert you as soon as <strong>{notifyProdName}</strong> becomes available.
+          </p>
+          <InputBox
+            label="Email or Mobile"
+            name="notifyContact"
+            type="text"
+            required
+            placeholder="e.g. sathish@gmail.com"
+            value={notifyEmail}
+            onChange={(e) => setNotifyEmail(e.target.value)}
+          />
+          <div className="flex justify-end gap-3 pt-2">
+            <Button variant="outline" size="sm" onClick={() => setIsNotifyOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" variant="primary" size="sm" className="bg-[#2E7D32]">
+              Subscribe Alert
+            </Button>
+          </div>
+        </form>
+      </Modal>
 
       <Footer />
     </div>

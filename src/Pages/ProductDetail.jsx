@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { Star, ShoppingCart, Heart, ShieldCheck, ChevronRight, Check } from "lucide-react";
+import { Star, ShoppingCart, Heart, ShieldCheck, ChevronRight, Check, Bell } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import Button from "../components/Button";
 import Toast from "../components/Toast";
+import Modal from "../components/Modal";
 import InputBox from "../components/InputBox";
 import API from "../utils/api";
 import { CartContext } from "../context/CartContext";
@@ -22,6 +23,28 @@ const ProductDetail = () => {
   const [qty, setQty] = useState(1);
   const [reviews, setReviews] = useState([]);
   const [relatedProducts, setRelatedProducts] = useState([]);
+
+  // Coming soon notification
+  const [isNotifyOpen, setIsNotifyOpen] = useState(false);
+  const [notifyEmail, setNotifyEmail] = useState("");
+  const [notifyProdName, setNotifyProdName] = useState("");
+
+  const openNotifyModal = (productName) => {
+    setNotifyProdName(productName || product?.name || "");
+    setIsNotifyOpen(true);
+  };
+
+  const handleNotifySubmit = (e) => {
+    e.preventDefault();
+    if (notifyEmail.trim()) {
+      setIsNotifyOpen(false);
+      setToast({
+        type: "success",
+        message: `Notification saved! We will notify you when ${notifyProdName} launches.`
+      });
+      setNotifyEmail("");
+    }
+  };
 
   // Review submission state
   const [newRating, setNewRating] = useState(5);
@@ -217,13 +240,21 @@ const ProductDetail = () => {
 
               {/* Price Details */}
               <div className="mt-5 flex items-baseline gap-3">
-                <span className="text-3xl font-black text-[#111827]">
-                  Rs. {selectedVariant?.price || product.discountPrice || product.price}
-                </span>
-                {product.discountPrice && !selectedVariant?.price && (
-                  <span className="text-sm font-semibold text-gray-400 line-through">
-                    Rs. {product.price}
+                {product.isComingSoon ? (
+                  <span className="text-3xl font-black text-amber-600">
+                    Price TBA
                   </span>
+                ) : (
+                  <>
+                    <span className="text-3xl font-black text-[#111827]">
+                      Rs. {selectedVariant?.price || product.discountPrice || product.price}
+                    </span>
+                    {product.discountPrice && !selectedVariant?.price && (
+                      <span className="text-sm font-semibold text-gray-400 line-through">
+                        Rs. {product.price}
+                      </span>
+                    )}
+                  </>
                 )}
               </div>
 
@@ -256,73 +287,140 @@ const ProductDetail = () => {
               )}
 
               {/* Quantity selector */}
-              <div className="mt-6 flex items-center gap-4">
-                <span className="text-xs font-bold text-gray-400 uppercase tracking-wide">Quantity</span>
-                <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-[#F8FAFC]">
-                  <button
-                    onClick={() => setQty((prev) => Math.max(1, prev - 1))}
-                    className="px-3.5 py-1.5 font-bold hover:bg-gray-100 transition"
-                  >
-                    -
-                  </button>
-                  <span className="px-5 font-bold text-sm text-[#1E293B]">{qty}</span>
-                  <button
-                    onClick={() => setQty((prev) => prev + 1)}
-                    className="px-3.5 py-1.5 font-bold hover:bg-gray-100 transition"
-                  >
-                    +
-                  </button>
+              {!product.isComingSoon && (
+                <div className="mt-6 flex items-center gap-4">
+                  <span className="text-xs font-bold text-gray-400 uppercase tracking-wide">Quantity</span>
+                  <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-[#F8FAFC]">
+                    <button
+                      onClick={() => setQty((prev) => Math.max(1, prev - 1))}
+                      className="px-3.5 py-1.5 font-bold hover:bg-gray-100 transition"
+                    >
+                      -
+                    </button>
+                    <span className="px-5 font-bold text-sm text-[#1E293B]">{qty}</span>
+                    <button
+                      onClick={() => setQty((prev) => prev + 1)}
+                      className="px-3.5 py-1.5 font-bold hover:bg-gray-100 transition"
+                    >
+                      +
+                    </button>
+                  </div>
+                  
+                  {/* Stock details */}
+                  <span className="text-xs font-semibold text-gray-400">
+                    {selectedVariant ? selectedVariant.stock : product.stock} units available
+                  </span>
                 </div>
-                
-                {/* Stock details */}
-                <span className="text-xs font-semibold text-gray-400">
-                  {selectedVariant ? selectedVariant.stock : product.stock} units available
-                </span>
-              </div>
+              )}
             </div>
 
             {/* Action Buttons */}
-            <div className="mt-8 pt-6 border-t border-gray-100 flex flex-col sm:flex-row gap-4">
-              <Button
-                onClick={handleAddToCart}
-                variant="outline"
-                className="flex-1 py-3.5 bg-white font-bold"
-                disabled={product.stock <= 0}
-              >
-                <ShoppingCart className="w-4.5 h-4.5 mr-2" />
-                Add to Cart
-              </Button>
-              <Button
-                onClick={handleBuyNow}
-                variant="primary"
-                className="flex-1 py-3.5 font-bold"
-                disabled={product.stock <= 0}
-              >
-                Buy Now
-              </Button>
-              
-              {/* Wishlist toggle icon */}
-              <button
-                onClick={() => {
-                  toggleWishlist(product);
-                  setToast({ type: "info", message: "Wishlist updated!" });
-                }}
-                className={`p-3.5 rounded-lg border flex items-center justify-center transition
-                  ${isInWishlist(product._id)
-                    ? "border-red-200 bg-red-50 text-red-500"
-                    : "border-gray-200 bg-white text-gray-400 hover:text-red-500"
-                  }`}
-              >
-                <Heart className="w-5 h-5 fill-current" />
-              </button>
-            </div>
+            {product.isComingSoon ? (
+              <div className="mt-8 pt-6 border-t border-gray-100 flex flex-col sm:flex-row gap-4">
+                <Button
+                  onClick={openNotifyModal}
+                  variant="accent"
+                  className="flex-1 py-3.5 font-bold inline-flex items-center justify-center bg-amber-500 hover:bg-amber-600 border-0 text-white"
+                >
+                  <Bell className="w-4.5 h-4.5 mr-2" />
+                  Notify Me on Launch
+                </Button>
+                
+                {/* Wishlist toggle icon */}
+                <button
+                  onClick={() => {
+                    toggleWishlist(product);
+                    setToast({ type: "info", message: "Wishlist updated!" });
+                  }}
+                  className={`p-3.5 rounded-lg border flex items-center justify-center transition
+                    ${isInWishlist(product._id)
+                      ? "border-red-200 bg-red-50 text-red-500"
+                      : "border-gray-200 bg-white text-gray-400 hover:text-red-500"
+                    }`}
+                >
+                  <Heart className="w-5 h-5 fill-current" />
+                </button>
+              </div>
+            ) : (
+              <div className="mt-8 pt-6 border-t border-gray-100 flex flex-col sm:flex-row gap-4">
+                <Button
+                  onClick={handleAddToCart}
+                  variant="outline"
+                  className="flex-1 py-3.5 bg-white font-bold"
+                  disabled={product.stock <= 0}
+                >
+                  <ShoppingCart className="w-4.5 h-4.5 mr-2" />
+                  Add to Cart
+                </Button>
+                <Button
+                  onClick={handleBuyNow}
+                  variant="primary"
+                  className="flex-1 py-3.5 font-bold"
+                  disabled={product.stock <= 0}
+                >
+                  Buy Now
+                </Button>
+                
+                {/* Wishlist toggle icon */}
+                <button
+                  onClick={() => {
+                    toggleWishlist(product);
+                    setToast({ type: "info", message: "Wishlist updated!" });
+                  }}
+                  className={`p-3.5 rounded-lg border flex items-center justify-center transition
+                    ${isInWishlist(product._id)
+                      ? "border-red-200 bg-red-50 text-red-500"
+                      : "border-gray-200 bg-white text-gray-400 hover:text-red-500"
+                    }`}
+                >
+                  <Heart className="w-5 h-5 fill-current" />
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Product detailed description */}
-        <div className="bg-white border border-gray-100 p-8 rounded-2xl shadow-sm mb-12">
-          <h3 className="text-xl font-bold text-[#1E293B] border-b border-gray-100 pb-3 mb-4">Detailed Description</h3>
-          <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-line">{product.description}</p>
+        {/* Product detailed description & Specifications */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
+          {/* Detailed Description */}
+          <div className="lg:col-span-7 bg-white border border-gray-100 p-8 rounded-2xl shadow-sm">
+            <h3 className="text-xl font-bold text-[#1E293B] border-b border-gray-100 pb-3 mb-4">Detailed Description</h3>
+            <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-line">{product.description}</p>
+          </div>
+
+          {/* Specifications Card */}
+          <div className="lg:col-span-5 bg-white border border-gray-100 p-8 rounded-2xl shadow-sm">
+            <h3 className="text-xl font-bold text-[#1E293B] border-b border-gray-100 pb-3 mb-4">Product Specifications</h3>
+            <div className="divide-y divide-gray-100 text-xs">
+              {[
+                { label: "Weight / Unit Size", value: product.weight },
+                { label: "Country of Origin", value: product.origin },
+                { label: "Shelf Life / Expiry", value: product.shelfLife },
+                { label: "Dimensions", value: product.dimensions },
+                { label: "Warranty Info", value: product.warranty },
+                { label: "Model Number", value: product.modelNumber },
+                { label: "Warranty Period", value: product.warrantyPeriod },
+                { label: "Material", value: product.material },
+                { label: "Gender Target", value: product.gender },
+                { label: "Capacity", value: product.capacity },
+                { label: "Skin Type", value: product.skinType },
+                { label: "Ingredients", value: product.ingredients },
+                { label: "Volume / Size", value: product.volume }
+              ].map((spec, idx) => (
+                spec.value ? (
+                  <div key={idx} className="py-3 flex justify-between font-semibold">
+                    <span className="text-gray-400 uppercase tracking-wider text-[10px]">{spec.label}</span>
+                    <span className="text-[#1E293B] text-right">{spec.value}</span>
+                  </div>
+                ) : null
+              ))}
+              {!product.weight && !product.origin && !product.shelfLife && !product.dimensions && !product.warranty && 
+               !product.modelNumber && !product.warrantyPeriod && !product.material && !product.gender && 
+               !product.capacity && !product.skinType && !product.ingredients && !product.volume && (
+                <p className="text-gray-400 italic text-center py-6">No specific parameters available for this product.</p>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* REVIEWS & SUBMISSION SECTION */}
@@ -429,8 +527,17 @@ const ProductDetail = () => {
                     <h4 onClick={() => navigate(`/product/${prod._id}`)} className="font-bold text-xs text-[#1E293B] hover:text-[#2E7D32] cursor-pointer line-clamp-2">{prod.name}</h4>
                   </div>
                   <div className="flex justify-between items-center mt-3 pt-2 border-t border-gray-50">
-                    <span className="font-extrabold text-sm text-[#111827]">Rs. {prod.discountPrice || prod.price}</span>
-                    <Button onClick={() => { addToCart(prod, 1); setToast({ type: "success", message: "Added to cart!" }); }} variant="primary" size="sm">Add</Button>
+                    {prod.isComingSoon ? (
+                      <>
+                        <span className="font-extrabold text-xs text-amber-600">Price TBA</span>
+                        <Button onClick={() => openNotifyModal(prod.name)} variant="accent" size="sm" className="bg-amber-500 hover:bg-amber-600 border-0 text-white py-1 px-3 text-[10px]">Notify</Button>
+                      </>
+                    ) : (
+                      <>
+                        <span className="font-extrabold text-sm text-[#111827]">Rs. {prod.discountPrice || prod.price}</span>
+                        <Button onClick={() => { addToCart(prod, 1); setToast({ type: "success", message: "Added to cart!" }); }} variant="primary" size="sm">Add</Button>
+                      </>
+                    )}
                   </div>
                 </div>
               ))}
@@ -438,6 +545,32 @@ const ProductDetail = () => {
           </div>
         )}
       </main>
+
+      {/* Coming Soon Notification Modal */}
+      <Modal isOpen={isNotifyOpen} onClose={() => setIsNotifyOpen(false)} title="Notify Me">
+        <form onSubmit={handleNotifySubmit} className="space-y-4">
+          <p className="text-sm text-gray-500">
+            Submit your email or mobile contact. We'll alert you as soon as <strong>{notifyProdName}</strong> becomes available.
+          </p>
+          <InputBox
+            label="Email or Mobile"
+            name="notifyContact"
+            type="text"
+            required
+            placeholder="e.g. sathish@gmail.com"
+            value={notifyEmail}
+            onChange={(e) => setNotifyEmail(e.target.value)}
+          />
+          <div className="flex justify-end gap-3 pt-2">
+            <Button variant="outline" size="sm" onClick={() => setIsNotifyOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" variant="primary" size="sm" className="bg-[#2E7D32]">
+              Subscribe Alert
+            </Button>
+          </div>
+        </form>
+      </Modal>
 
       <Footer />
     </div>

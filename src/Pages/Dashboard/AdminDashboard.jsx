@@ -43,7 +43,7 @@ const AdminDashboard = () => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
-  const [showProductModal, setShowProductModal] = useState(false);
+  const [productAction, setProductAction] = useState("list"); // "list" | "add" | "edit"
   const [editingProduct, setEditingProduct] = useState(null);
   const [productData, setProductData] = useState({
     name: "",
@@ -56,11 +56,16 @@ const AdminDashboard = () => {
     category: "",
     subcategory: "",
     tags: "",
-    featured: false,
-    trending: false,
-    bestSeller: false,
-    comingSoon: false,
-    active: true
+    isFeatured: false,
+    isTrending: false,
+    isBestSeller: false,
+    isComingSoon: false,
+    isActive: true,
+    origin: "",
+    shelfLife: "",
+    dimensions: "",
+    warranty: "",
+    weight: ""
   });
   const [productImages, setProductImages] = useState([]);
 
@@ -181,7 +186,7 @@ const AdminDashboard = () => {
         });
         setToast({ type: "success", message: "Product added successfully!" });
       }
-      setShowProductModal(false);
+      setProductAction("list");
       setEditingProduct(null);
       setProductImages([]);
       const prodRes = await API.get("/products?limit=100");
@@ -204,13 +209,26 @@ const AdminDashboard = () => {
       category: prod.category?._id || prod.category || "",
       subcategory: prod.subcategory?._id || prod.subcategory || "",
       tags: prod.tags ? prod.tags.join(", ") : "",
-      featured: prod.featured || false,
-      trending: prod.trending || false,
-      bestSeller: prod.bestSeller || false,
-      comingSoon: prod.comingSoon || false,
-      active: prod.active ?? true
+      isFeatured: prod.isFeatured || false,
+      isTrending: prod.isTrending || false,
+      isBestSeller: prod.isBestSeller || false,
+      isComingSoon: prod.isComingSoon || false,
+      isActive: prod.isActive ?? true,
+      origin: prod.origin || "",
+      shelfLife: prod.shelfLife || "",
+      dimensions: prod.dimensions || "",
+      warranty: prod.warranty || "",
+      weight: prod.weight || "",
+      modelNumber: prod.modelNumber || "",
+      warrantyPeriod: prod.warrantyPeriod || "",
+      material: prod.material || "",
+      gender: prod.gender || "",
+      capacity: prod.capacity || "",
+      skinType: prod.skinType || "",
+      ingredients: prod.ingredients || "",
+      volume: prod.volume || ""
     });
-    setShowProductModal(true);
+    setProductAction("edit");
   };
 
   const handleProductDelete = async (prodId) => {
@@ -567,69 +585,253 @@ const AdminDashboard = () => {
 
         {/* Product Management Section */}
         {activeTab === "products" && (
-          <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
-            <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-50">
-              <h3 className="text-lg font-bold text-[#1E293B]">Manage Store Products</h3>
-              <Button onClick={() => {
-                setEditingProduct(null);
-                setProductData({
-                  name: "", SKU: "", price: "", discountPrice: "", stock: "", description: "",
-                  shortDescription: "", category: "", subcategory: "", tags: "",
-                  featured: false, trending: false, bestSeller: false, comingSoon: false, active: true
-                });
-                setShowProductModal(true);
-              }} variant="primary" size="sm" className="gap-1">
-                <Plus className="w-4 h-4" /> Add Product
-              </Button>
-            </div>
+          productAction === "list" ? (
+            <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+              <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-50">
+                <h3 className="text-lg font-bold text-[#1E293B]">Manage Store Products</h3>
+                <Button onClick={() => {
+                  setEditingProduct(null);
+                  setProductData({
+                    name: "", SKU: "", price: "", discountPrice: "", stock: "", description: "",
+                    shortDescription: "", category: "", subcategory: "", tags: "",
+                    isFeatured: false, isTrending: false, isBestSeller: false, isComingSoon: false, isActive: true,
+                    origin: "", shelfLife: "", dimensions: "", warranty: "", weight: "",
+                    modelNumber: "", warrantyPeriod: "", material: "", gender: "", capacity: "", skinType: "", ingredients: "", volume: ""
+                  });
+                  setProductAction("add");
+                }} variant="primary" size="sm" className="gap-1">
+                  <Plus className="w-4 h-4" /> Add Product
+                </Button>
+              </div>
 
-            {/* List */}
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse text-xs">
-                <thead>
-                  <tr className="border-b border-gray-100 text-gray-400 font-bold">
-                    <th className="p-3">Product Name</th>
-                    <th className="p-3">SKU</th>
-                    <th className="p-3">Base Price</th>
-                    <th className="p-3">Discount</th>
-                    <th className="p-3">Stock</th>
-                    <th className="p-3">Featured / Soon</th>
-                    <th className="p-3 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-50 font-semibold text-[#1E293B]">
-                  {products.map((p) => (
-                    <tr key={p._id} className="hover:bg-gray-50/50">
-                      <td className="p-3 flex items-center gap-2">
-                        <img
-                          src={p.images?.[0] ? p.images[0].startsWith("http") ? p.images[0] : `http://localhost:8000${p.images[0]}` : "https://images.unsplash.com/photo-1542838132-92c53300491e?w=500&auto=format&fit=crop&q=60"}
-                          alt={p.name}
-                          className="w-10 h-10 object-cover rounded border border-gray-100 bg-gray-50"
-                        />
-                        <span className="truncate max-w-[120px] font-bold">{p.name}</span>
-                      </td>
-                      <td className="p-3 font-mono text-gray-500">{p.SKU}</td>
-                      <td className="p-3">Rs. {p.price.toFixed(2)}</td>
-                      <td className="p-3 text-emerald-700">{p.discountPrice ? `Rs. ${p.discountPrice.toFixed(2)}` : "-"}</td>
-                      <td className={`p-3 font-bold ${p.stock <= 5 ? "text-red-500" : "text-gray-700"}`}>{p.stock} units</td>
-                      <td className="p-3 text-[10px] space-x-1">
-                        {p.featured && <span className="bg-emerald-50 text-[#2E7D32] px-1.5 py-0.5 rounded font-bold">Featured</span>}
-                        {p.comingSoon && <span className="bg-amber-50 text-[#B45309] px-1.5 py-0.5 rounded font-bold">Soon</span>}
-                      </td>
-                      <td className="p-3 text-right space-x-1">
-                        <button onClick={() => handleProductEditClick(p)} className="p-1 text-gray-400 hover:text-emerald-700 hover:bg-emerald-50 rounded transition">
-                          <Edit className="w-4 h-4" />
-                        </button>
-                        <button onClick={() => handleProductDelete(p._id)} className="p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition">
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </td>
+              {/* List */}
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="border-b border-gray-100 text-gray-400 font-bold">
+                      <th className="p-3">Product Name</th>
+                      <th className="p-3">SKU</th>
+                      <th className="p-3">Base Price</th>
+                      <th className="p-3">Discount</th>
+                      <th className="p-3">Stock</th>
+                      <th className="p-3">Featured / Soon</th>
+                      <th className="p-3 text-right">Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-gray-50 font-semibold text-[#1E293B]">
+                    {products.map((p) => (
+                      <tr key={p._id} className="hover:bg-gray-50/50">
+                        <td className="p-3 flex items-center gap-2">
+                          <img
+                            src={p.images?.[0] ? p.images[0].startsWith("http") ? p.images[0] : `http://localhost:8000${p.images[0]}` : "https://images.unsplash.com/photo-1542838132-92c53300491e?w=500&auto=format&fit=crop&q=60"}
+                            alt={p.name}
+                            className="w-10 h-10 object-cover rounded border border-gray-100 bg-gray-50"
+                          />
+                          <span className="truncate max-w-[120px] font-bold">{p.name}</span>
+                        </td>
+                        <td className="p-3 font-mono text-gray-500">{p.SKU}</td>
+                        <td className="p-3">Rs. {p.price.toFixed(2)}</td>
+                        <td className="p-3 text-emerald-700">{p.discountPrice ? `Rs. ${p.discountPrice.toFixed(2)}` : "-"}</td>
+                        <td className={`p-3 font-bold ${p.stock <= 5 ? "text-red-500" : "text-gray-700"}`}>{p.stock} units</td>
+                        <td className="p-3 text-[10px] space-x-1">
+                          {p.isFeatured && <span className="bg-emerald-50 text-[#2E7D32] px-1.5 py-0.5 rounded font-bold">Featured</span>}
+                          {p.isComingSoon && <span className="bg-amber-50 text-[#B45309] px-1.5 py-0.5 rounded font-bold">Soon</span>}
+                        </td>
+                        <td className="p-3 text-right space-x-1">
+                          <button onClick={() => handleProductEditClick(p)} className="p-1 text-gray-400 hover:text-emerald-700 hover:bg-emerald-50 rounded transition">
+                            <Edit className="w-4 h-4" />
+                          </button>
+                          <button onClick={() => handleProductDelete(p._id)} className="p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition">
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 space-y-6">
+              <div className="flex justify-between items-center pb-4 border-b border-gray-150">
+                <div>
+                  <h3 className="text-xl font-black text-[#1E293B]">{productAction === "edit" ? "Edit Nest Product" : "Add Nest Product"}</h3>
+                  <p className="text-gray-500 text-xs mt-1">Fill in the fields below to customize the catalog listing.</p>
+                </div>
+                <Button variant="outline" size="sm" onClick={() => setProductAction("list")}>
+                  ← Back to Products List
+                </Button>
+              </div>
+
+              <form onSubmit={handleProductSubmit} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <InputBox label="Product Name" value={productData.name} onChange={(e) => setProductData({ ...productData, name: e.target.value })} required />
+                  <InputBox label="SKU Code" value={productData.SKU} onChange={(e) => setProductData({ ...productData, SKU: e.target.value })} required />
+                  <InputBox label="Price (Rs.)" type="number" value={productData.price} onChange={(e) => setProductData({ ...productData, price: e.target.value })} required />
+                  <InputBox label="Discount Price (Rs.)" type="number" value={productData.discountPrice} onChange={(e) => setProductData({ ...productData, discountPrice: e.target.value })} />
+                  <InputBox label="Stock Inventory" type="number" value={productData.stock} onChange={(e) => setProductData({ ...productData, stock: e.target.value })} required />
+                  <InputBox label="Comma Tags (e.g. organic, fresh)" value={productData.tags} onChange={(e) => setProductData({ ...productData, tags: e.target.value })} />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <SelectBox
+                    label="Main Category"
+                    placeholder="Choose Main Category"
+                    value={productData.category}
+                    onChange={(e) => setProductData({ ...productData, category: e.target.value })}
+                    options={categories.map((c) => ({ value: c._id, label: c.name }))}
+                    required
+                  />
+                  <SelectBox
+                    label="Subcategory"
+                    placeholder="Choose Subcategory"
+                    value={productData.subcategory}
+                    onChange={(e) => setProductData({ ...productData, subcategory: e.target.value })}
+                    options={subcategories.filter((s) => s.mainCategory?._id === productData.category).map((s) => ({ value: s._id, label: s.name }))}
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="block text-xs font-bold text-gray-700">Short Description</label>
+                  <textarea
+                    value={productData.shortDescription}
+                    onChange={(e) => setProductData({ ...productData, shortDescription: e.target.value })}
+                    className="w-full border border-gray-200 rounded-lg p-2.5 text-xs focus:outline-none"
+                    rows="2"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="block text-xs font-bold text-gray-700">Detailed Description</label>
+                  <textarea
+                    value={productData.description}
+                    onChange={(e) => setProductData({ ...productData, description: e.target.value })}
+                    className="w-full border border-gray-200 rounded-lg p-2.5 text-xs focus:outline-none"
+                    rows="4"
+                    required
+                  />
+                </div>
+
+                {/* Custom Specifications Grid based on Category */}
+                <div className="border-t border-gray-150 pt-6">
+                  {(() => {
+                    const selectedCategoryObj = categories.find((c) => c._id === productData.category);
+                    const categoryName = selectedCategoryObj ? selectedCategoryObj.name.toLowerCase() : "";
+                    
+                    if (categoryName.includes("elect")) {
+                      return (
+                        <div>
+                          <h4 className="text-xs font-bold text-[#2E7D32] uppercase tracking-wide mb-4">🔧 Electronics Details</h4>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <InputBox label="Model Number" value={productData.modelNumber} onChange={(e) => setProductData({ ...productData, modelNumber: e.target.value })} />
+                            <InputBox label="Warranty Period (e.g. 1 Year)" value={productData.warrantyPeriod} onChange={(e) => setProductData({ ...productData, warrantyPeriod: e.target.value })} />
+                          </div>
+                        </div>
+                      );
+                    } else if (categoryName.includes("fash") || categoryName.includes("cloth")) {
+                      return (
+                        <div>
+                          <h4 className="text-xs font-bold text-[#2E7D32] uppercase tracking-wide mb-4">👕 Fashion Details</h4>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-1">
+                              <label className="block text-xs font-bold text-gray-700">Gender Target</label>
+                              <select
+                                value={productData.gender}
+                                onChange={(e) => setProductData({ ...productData, gender: e.target.value })}
+                                className="w-full border border-gray-200 rounded-lg p-2.5 text-xs focus:outline-none bg-white h-10"
+                              >
+                                <option value="">Select Gender</option>
+                                <option value="Men">Men</option>
+                                <option value="Women">Women</option>
+                                <option value="Unisex">Unisex</option>
+                                <option value="Kids">Kids</option>
+                              </select>
+                            </div>
+                            <InputBox label="Material (e.g. Cotton, Leather)" value={productData.material} onChange={(e) => setProductData({ ...productData, material: e.target.value })} />
+                          </div>
+                        </div>
+                      );
+                    } else if (categoryName.includes("home") || categoryName.includes("kitchen")) {
+                      return (
+                        <div>
+                          <h4 className="text-xs font-bold text-[#2E7D32] uppercase tracking-wide mb-4">🏠 Home & Kitchen Details</h4>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <InputBox label="Material / Composition" value={productData.material} onChange={(e) => setProductData({ ...productData, material: e.target.value })} />
+                            <InputBox label="Capacity (e.g. 5 Litres, 1200W)" value={productData.capacity} onChange={(e) => setProductData({ ...productData, capacity: e.target.value })} />
+                          </div>
+                        </div>
+                      );
+                    } else if (categoryName.includes("beauty") || categoryName.includes("care") || categoryName.includes("cosmetic")) {
+                      return (
+                        <div>
+                          <h4 className="text-xs font-bold text-[#2E7D32] uppercase tracking-wide mb-4">💄 Beauty & Personal Care Details</h4>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <InputBox label="Skin Type Target (e.g. All, Dry)" value={productData.skinType} onChange={(e) => setProductData({ ...productData, skinType: e.target.value })} />
+                            <InputBox label="Volume / Size (e.g. 100ml, 50g)" value={productData.volume} onChange={(e) => setProductData({ ...productData, volume: e.target.value })} />
+                            <div className="md:col-span-2 space-y-1">
+                              <label className="block text-xs font-bold text-gray-700">Ingredients List</label>
+                              <textarea
+                                value={productData.ingredients}
+                                onChange={(e) => setProductData({ ...productData, ingredients: e.target.value })}
+                                className="w-full border border-gray-200 rounded-lg p-2.5 text-xs focus:outline-none"
+                                rows="2"
+                                placeholder="List key ingredients..."
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    } else {
+                      return (
+                        <div>
+                          <h4 className="text-xs font-bold text-[#2E7D32] uppercase tracking-wide mb-4">📦 General Specifications</h4>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <InputBox label="Product Weight / Unit (e.g. 500g, 1L)" value={productData.weight} onChange={(e) => setProductData({ ...productData, weight: e.target.value })} />
+                            <InputBox label="Country of Origin / Source" value={productData.origin} onChange={(e) => setProductData({ ...productData, origin: e.target.value })} />
+                            <InputBox label="Shelf Life / Expiry Info" value={productData.shelfLife} onChange={(e) => setProductData({ ...productData, shelfLife: e.target.value })} />
+                            <InputBox label="Dimensions (e.g. 10x10x5 cm)" value={productData.dimensions} onChange={(e) => setProductData({ ...productData, dimensions: e.target.value })} />
+                            <InputBox label="Warranty Description" value={productData.warranty} onChange={(e) => setProductData({ ...productData, warranty: e.target.value })} />
+                          </div>
+                        </div>
+                      );
+                    }
+                  })()}
+                </div>
+
+                {/* Checkboxes */}
+                <div className="flex flex-wrap gap-4 text-xs font-bold pt-4 border-t border-gray-100">
+                  {["isFeatured", "isTrending", "isBestSeller", "isComingSoon"].map((flag) => (
+                    <label key={flag} className="flex items-center gap-1.5 capitalize text-gray-600">
+                      <input
+                        type="checkbox"
+                        checked={productData[flag]}
+                        onChange={(e) => setProductData({ ...productData, [flag]: e.target.checked })}
+                        className="w-4 h-4 text-[#2E7D32]"
+                      />
+                      {flag.replace("is", "").replace(/([A-Z])/g, " $1").trim()}
+                    </label>
+                  ))}
+                </div>
+
+                {/* Upload File */}
+                <div className="space-y-1 pt-4 border-t border-gray-100">
+                  <label className="block text-xs font-bold text-gray-700">Upload Product Images</label>
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={(e) => setProductImages(Array.from(e.target.files))}
+                    className="w-full text-xs"
+                  />
+                </div>
+
+                <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
+                  <Button variant="outline" size="sm" onClick={() => setProductAction("list")}>Cancel</Button>
+                  <Button type="submit" variant="primary" size="sm">Save Product</Button>
+                </div>
+              </form>
+            </div>
+          )
         )}
 
         {/* Categories Catalog Manager Tab */}
@@ -676,14 +878,14 @@ const AdminDashboard = () => {
                   Add Subcategory
                 </Button>
               </div>
-              <div className="divide-y divide-gray-50 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                 {subcategories.map((sub) => (
-                  <div key={sub._id} className="py-3.5 flex justify-between items-center">
+                  <div key={sub._id} className="bg-[#F8FAFC] border border-gray-100 rounded-2xl p-4 flex flex-col justify-between hover:shadow-sm transition-all duration-200">
                     <div>
-                      <p className="font-bold text-gray-800">{sub.name}</p>
-                      <p className="text-[10px] text-[#2E7D32] mt-0.5">Parent: {sub.mainCategory?.name || "None"}</p>
+                      <p className="font-bold text-[#1E293B] text-sm">{sub.name}</p>
+                      <p className="text-[10px] text-[#2E7D32] font-semibold mt-0.5">Parent: {sub.mainCategory?.name || "None"}</p>
                     </div>
-                    <span className="text-[10px] text-gray-400 italic truncate max-w-[120px]">{sub.description}</span>
+                    <p className="text-[10px] text-gray-400 italic mt-2.5 line-clamp-2">{sub.description || "No description provided."}</p>
                   </div>
                 ))}
               </div>
@@ -855,92 +1057,7 @@ const AdminDashboard = () => {
 
       {/* MODALS */}
 
-      {/* Product Save Modal */}
-      {showProductModal && (
-        <Modal title={editingProduct ? "Edit Nest Product" : "Add Nest Product"} onClose={() => setShowProductModal(false)}>
-          <form onSubmit={handleProductSubmit} className="space-y-4 max-h-[80vh] overflow-y-auto pr-2">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <InputBox label="Product Name" value={productData.name} onChange={(e) => setProductData({ ...productData, name: e.target.value })} required />
-              <InputBox label="SKU Code" value={productData.SKU} onChange={(e) => setProductData({ ...productData, SKU: e.target.value })} required />
-              <InputBox label="Price (Rs.)" type="number" value={productData.price} onChange={(e) => setProductData({ ...productData, price: e.target.value })} required />
-              <InputBox label="Discount Price (Rs.)" type="number" value={productData.discountPrice} onChange={(e) => setProductData({ ...productData, discountPrice: e.target.value })} />
-              <InputBox label="Stock Inventory" type="number" value={productData.stock} onChange={(e) => setProductData({ ...productData, stock: e.target.value })} required />
-              <InputBox label="Comma Tags (e.g. organic, fresh)" value={productData.tags} onChange={(e) => setProductData({ ...productData, tags: e.target.value })} />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <SelectBox
-                label="Main Category"
-                placeholder="Choose Main Category"
-                value={productData.category}
-                onChange={(e) => setProductData({ ...productData, category: e.target.value })}
-                options={categories.map((c) => ({ value: c._id, label: c.name }))}
-                required
-              />
-              <SelectBox
-                label="Subcategory"
-                placeholder="Choose Subcategory"
-                value={productData.subcategory}
-                onChange={(e) => setProductData({ ...productData, subcategory: e.target.value })}
-                options={subcategories.filter((s) => s.mainCategory?._id === productData.category).map((s) => ({ value: s._id, label: s.name }))}
-              />
-            </div>
-
-            <div className="space-y-1">
-              <label className="block text-xs font-bold text-gray-700">Short Description</label>
-              <textarea
-                value={productData.shortDescription}
-                onChange={(e) => setProductData({ ...productData, shortDescription: e.target.value })}
-                className="w-full border border-gray-200 rounded-lg p-2.5 text-xs focus:outline-none"
-                rows="2"
-              />
-            </div>
-
-            <div className="space-y-1">
-              <label className="block text-xs font-bold text-gray-700">Detailed Description</label>
-              <textarea
-                value={productData.description}
-                onChange={(e) => setProductData({ ...productData, description: e.target.value })}
-                className="w-full border border-gray-200 rounded-lg p-2.5 text-xs focus:outline-none"
-                rows="4"
-                required
-              />
-            </div>
-
-            {/* Checkboxes */}
-            <div className="flex flex-wrap gap-4 text-xs font-bold">
-              {["featured", "trending", "bestSeller", "comingSoon"].map((flag) => (
-                <label key={flag} className="flex items-center gap-1.5 capitalize text-gray-600">
-                  <input
-                    type="checkbox"
-                    checked={productData[flag]}
-                    onChange={(e) => setProductData({ ...productData, [flag]: e.target.checked })}
-                    className="w-4 h-4 text-[#2E7D32]"
-                  />
-                  {flag.replace(/([A-Z])/g, " $1")}
-                </label>
-              ))}
-            </div>
-
-            {/* Upload File */}
-            <div className="space-y-1">
-              <label className="block text-xs font-bold text-gray-700">Upload Product Images</label>
-              <input
-                type="file"
-                multiple
-                accept="image/*"
-                onChange={(e) => setProductImages(Array.from(e.target.files))}
-                className="w-full text-xs"
-              />
-            </div>
-
-            <div className="flex justify-end gap-3 pt-3">
-              <Button variant="outline" size="sm" onClick={() => setShowProductModal(false)}>Cancel</Button>
-              <Button type="submit" variant="primary" size="sm">Save Product</Button>
-            </div>
-          </form>
-        </Modal>
-      )}
+      {/* Product Save Modal Removed (Form rendered inline on page instead) */}
 
       {/* Main Category Save Modal */}
       {showCategoryModal && (

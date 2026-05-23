@@ -42,6 +42,11 @@ export const CartProvider = ({ children }) => {
 
   // ADD TO CART
   const addToCart = (product, quantity = 1, selectedVariant = null) => {
+    if (product.isComingSoon) {
+      console.warn("Cannot add a coming soon product to the cart.");
+      return;
+    }
+
     setCartItems((prev) => {
       // Look for identical product and variant
       const exists = prev.find(
