@@ -7,6 +7,7 @@ import Footer from "../components/Footer";
 import Button from "../components/Button";
 import InputBox from "../components/InputBox";
 import Toast from "../components/Toast";
+import { getImageUrl } from "../utils/api";
 
 const Cart = () => {
   const {
@@ -80,13 +81,7 @@ const Cart = () => {
                   className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100 flex gap-4 md:gap-6 items-center hover:shadow-md transition duration-200"
                 >
                   <img
-                    src={
-                      item.image
-                        ? item.image.startsWith("http")
-                          ? item.image
-                          : `https://dailynest-be.onrender.com${item.image}`
-                        : "https://images.unsplash.com/photo-1542838132-92c53300491e?w=500&auto=format&fit=crop&q=60"
-                    }
+                    src={getImageUrl(item.image, "https://images.unsplash.com/photo-1542838132-92c53300491e?w=500&auto=format&fit=crop&q=60")}
                     alt={item.name}
                     className="w-20 h-20 md:w-24 md:h-24 object-cover rounded-xl border border-gray-100 bg-gray-50"
                   />
