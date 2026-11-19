@@ -26,7 +26,7 @@ import InputBox from "../../components/InputBox";
 import SelectBox from "../../components/SelectBox";
 import Toast from "../../components/Toast";
 import Modal from "../../components/Modal";
-import API from "../../utils/api";
+import API, { getImageUrl } from "../../utils/api";
 
 const COLORS = ["#2E7D32", "#1E293B", "#F59E0B", "#EF4444", "#3B82F6"];
 
@@ -623,7 +623,7 @@ const AdminDashboard = () => {
                       <tr key={p._id} className="hover:bg-gray-50/50">
                         <td className="p-3 flex items-center gap-2">
                           <img
-                            src={p.images?.[0] ? p.images[0].startsWith("http") ? p.images[0] : `https://dailynest-be.onrender.com${p.images[0]}` : "https://images.unsplash.com/photo-1542838132-92c53300491e?w=500&auto=format&fit=crop&q=60"}
+                            src={getImageUrl(p.images?.[0], "https://images.unsplash.com/photo-1542838132-92c53300491e?w=500&auto=format&fit=crop&q=60")}
                             alt={p.name}
                             className="w-10 h-10 object-cover rounded border border-gray-100 bg-gray-50"
                           />
@@ -854,7 +854,7 @@ const AdminDashboard = () => {
                   <div key={cat._id} className="py-3.5 flex justify-between items-center">
                     <div className="flex items-center gap-2">
                       <img
-                        src={cat.image ? cat.image.startsWith("http") ? cat.image : `https://dailynest-be.onrender.com${cat.image}` : ""}
+                        src={getImageUrl(cat.image)}
                         alt={cat.name}
                         className="w-8 h-8 rounded-lg object-cover bg-gray-50 border border-gray-100"
                       />
@@ -1006,7 +1006,7 @@ const AdminDashboard = () => {
               {banners.map((b) => (
                 <div key={b._id} className="border border-gray-100 rounded-2xl overflow-hidden shadow-sm bg-white">
                   <img
-                    src={b.image ? b.image.startsWith("http") ? b.image : `https://dailynest-be.onrender.com${b.image}` : ""}
+                    src={getImageUrl(b.image)}
                     alt={b.title}
                     className="w-full h-36 object-cover bg-gray-50"
                   />

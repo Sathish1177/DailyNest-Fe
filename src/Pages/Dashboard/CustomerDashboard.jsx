@@ -6,7 +6,7 @@ import { CartContext } from "../../context/CartContext";
 import Button from "../../components/Button";
 import InputBox from "../../components/InputBox";
 import Toast from "../../components/Toast";
-import API from "../../utils/api";
+import API, { getImageUrl } from "../../utils/api";
 
 const CustomerDashboard = () => {
   const { user, updateProfile, changePassword, addAddress, deleteAddress, logout } = useContext(AuthContext);
@@ -449,13 +449,7 @@ const CustomerDashboard = () => {
                   >
                     <div className="relative aspect-square bg-gray-50">
                       <img
-                        src={
-                          prod.images && prod.images[0]
-                            ? prod.images[0].startsWith("http")
-                              ? prod.images[0]
-                              : `https://dailynest-be.onrender.com${prod.images[0]}`
-                            : "https://images.unsplash.com/photo-1542838132-92c53300491e?w=500&auto=format&fit=crop&q=60"
-                        }
+                        src={getImageUrl(prod.images?.[0], "https://images.unsplash.com/photo-1542838132-92c53300491e?w=500&auto=format&fit=crop&q=60")}
                         alt={prod.name}
                         className="w-full h-full object-cover"
                       />

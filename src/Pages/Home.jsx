@@ -7,7 +7,7 @@ import Button from "../components/Button";
 import Toast from "../components/Toast";
 import Modal from "../components/Modal";
 import InputBox from "../components/InputBox";
-import API from "../utils/api";
+import API, { getImageUrl } from "../utils/api";
 import { CartContext } from "../context/CartContext";
 import heroBannerImg from "../assets/hero-banner.jpg";
 import brandLogo from "../assets/logo/Dailynest Fresh Grocery Logo.png";
@@ -63,7 +63,7 @@ const Home = () => {
         const bannerRes = await API.get("/banners");
         const mappedBanners = bannerRes.data.map(b => ({
           ...b,
-          image: b.image ? (b.image.startsWith("http") ? b.image : `https://dailynest-be.onrender.com${b.image}`) : ""
+          image: b.image ? getImageUrl(b.image) : ""
         }));
         const heroBanners = mappedBanners.filter(b => b.type === "Hero" || !b.type);
         setBanners(heroBanners);
@@ -72,7 +72,7 @@ const Home = () => {
         const catRes = await API.get("/categories?activeOnly=true");
         const mappedCategories = catRes.data.map(cat => ({
           ...cat,
-          image: cat.image ? (cat.image.startsWith("http") ? cat.image : `https://dailynest-be.onrender.com${cat.image}`) : ""
+          image: cat.image ? getImageUrl(cat.image) : ""
         }));
         setCategories(mappedCategories);
 
@@ -84,7 +84,7 @@ const Home = () => {
         const prodRes = await API.get("/products?isActive=true&limit=20");
         const mappedProds = prodRes.data.products.map(prod => {
           if (prod.images && prod.images.length > 0) {
-            prod.images = prod.images.map(img => img && !img.startsWith("http") ? `https://dailynest-be.onrender.com${img}` : img);
+            prod.images = prod.images.map(img => getImageUrl(img));
           }
           return prod;
         });
@@ -94,7 +94,7 @@ const Home = () => {
         const csRes = await API.get("/products?isComingSoon=true&limit=4");
         const mappedCS = csRes.data.products.map(prod => {
           if (prod.images && prod.images.length > 0) {
-            prod.images = prod.images.map(img => img && !img.startsWith("http") ? `https://dailynest-be.onrender.com${img}` : img);
+            prod.images = prod.images.map(img => getImageUrl(img));
           }
           return prod;
         });
@@ -298,9 +298,7 @@ const Home = () => {
                   ? `linear-gradient(to right, rgba(15,23,42,0.85), rgba(15,23,42,0.3)), url(${
                       banners[activeBannerIdx].image === "/uploads/hero-banner.jpg"
                         ? heroBannerImg
-                        : banners[activeBannerIdx].image.startsWith("http")
-                        ? banners[activeBannerIdx].image
-                        : `https://dailynest-be.onrender.com${banners[activeBannerIdx].image}`
+                        : getImageUrl(banners[activeBannerIdx].image)
                     })`
                   : `linear-gradient(to right, rgba(15,23,42,0.85), rgba(15,23,42,0.3)), url(${heroBannerImg})`
               }}

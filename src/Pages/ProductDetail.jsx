@@ -7,7 +7,7 @@ import Button from "../components/Button";
 import Toast from "../components/Toast";
 import Modal from "../components/Modal";
 import InputBox from "../components/InputBox";
-import API from "../utils/api";
+import API, { getImageUrl } from "../utils/api";
 import { CartContext } from "../context/CartContext";
 import { AuthContext } from "../context/AuthContext";
 
@@ -61,7 +61,7 @@ const ProductDetail = () => {
       try {
         const { data } = await API.get(`/products/${id}`);
         if (data.images && data.images.length > 0) {
-          data.images = data.images.map(img => img && !img.startsWith("http") ? `https://dailynest-be.onrender.com${img}` : img);
+          data.images = data.images.map(img => getImageUrl(img));
         }
         setProduct(data);
         setActiveImage(data.images?.[0] || "");
@@ -79,7 +79,7 @@ const ProductDetail = () => {
         const related = relRes.data.products.filter((p) => p._id !== data._id);
         const mappedRelated = related.map(p => {
           if (p.images && p.images.length > 0) {
-            p.images = p.images.map(img => img && !img.startsWith("http") ? `https://dailynest-be.onrender.com${img}` : img);
+            p.images = p.images.map(img => getImageUrl(img));
           }
           return p;
         });

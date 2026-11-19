@@ -1,12 +1,13 @@
 import axios from "axios";
 
-// Central Single Source of Truth for Backend URL
+// Single Source of Truth for Live Backend Base URL
 export const BASE_URL = import.meta.env.VITE_BACKEND_URL || "https://dailynest-be.onrender.com";
 
-// Central helper to resolve image URLs across the entire application
+// Helper function to resolve backend uploaded images safely across all components
 export const getImageUrl = (imagePath, fallback = "") => {
-  if (!imagePath || typeof imagePath !== "string") return fallback;
-  if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
+  if (!imagePath) return fallback;
+  if (typeof imagePath !== "string") return fallback;
+  if (imagePath.startsWith("http://") || imagePath.startsWith("https://") || imagePath.startsWith("data:")) {
     return imagePath;
   }
   const cleanPath = imagePath.startsWith("/") ? imagePath : `/${imagePath}`;

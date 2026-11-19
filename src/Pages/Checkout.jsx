@@ -8,7 +8,7 @@ import Footer from "../components/Footer";
 import Button from "../components/Button";
 import InputBox from "../components/InputBox";
 import Toast from "../components/Toast";
-import API from "../utils/api";
+import API, { getImageUrl } from "../utils/api";
 
 const Checkout = () => {
   const { user, addAddress } = useContext(AuthContext);
@@ -350,13 +350,7 @@ const Checkout = () => {
                   <div key={`${item.product}-${JSON.stringify(item.selectedVariant)}`} className="flex justify-between items-center text-xs gap-3">
                     <div className="flex items-center gap-2.5 min-w-0">
                       <img
-                        src={
-                          item.image
-                            ? item.image.startsWith("http")
-                              ? item.image
-                              : `https://dailynest-be.onrender.com${item.image}`
-                            : "https://images.unsplash.com/photo-1542838132-92c53300491e?w=500&auto=format&fit=crop&q=60"
-                        }
+                        src={getImageUrl(item.image, "https://images.unsplash.com/photo-1542838132-92c53300491e?w=500&auto=format&fit=crop&q=60")}
                         alt={item.name}
                         className="w-10 h-10 object-cover rounded bg-gray-50 border border-gray-100"
                       />
