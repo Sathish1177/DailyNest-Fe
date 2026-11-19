@@ -309,7 +309,14 @@ const Home = () => {
                 </p>
                 <div className="pt-2">
                   <Button
-                    onClick={() => navigate(banners[activeBannerIdx].link || "/shop")}
+                    onClick={() => {
+                      const link = banners[activeBannerIdx]?.link;
+                      if (!link || link.includes("chatgpt") || !link.startsWith("/")) {
+                        navigate("/shop");
+                      } else {
+                        navigate(link.toLowerCase());
+                      }
+                    }}
                     variant="primary"
                     className="px-8 py-3.5 text-base shadow-lg"
                   >
