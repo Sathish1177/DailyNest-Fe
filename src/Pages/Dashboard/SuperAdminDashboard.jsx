@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { ShieldAlert, Users, Terminal, Settings, Plus, Edit, Trash2, Shield, Eye, Calendar, UserCheck } from "lucide-react";
+import { ShieldAlert, Users, Terminal, Settings, Plus, Edit, Trash2, Shield, Eye, Calendar, UserCheck, Store, ExternalLink, CheckCircle, Ban } from "lucide-react";
 import { AuthContext } from "../../context/AuthContext";
 import Button from "../../components/Button";
 import InputBox from "../../components/InputBox";
@@ -39,6 +39,33 @@ const SuperAdminDashboard = () => {
   // Audit Logs states
   const [logs, setLogs] = useState([]);
   const [loadingLogs, setLoadingLogs] = useState(false);
+
+  // Partner Stores states
+  const [stores, setStores] = useState([]);
+  const [loadingStores, setLoadingStores] = useState(false);
+
+  const fetchStores = async () => {
+    setLoadingStores(true);
+    try {
+      const { data } = await API.get("/stores/admin/all");
+      setStores(data || []);
+    } catch (err) {
+      console.error("Failed to load stores:", err.message);
+    } finally {
+      setLoadingStores(false);
+    }
+  };
+
+  const handleToggleStoreStatus = async (id, currentStatus) => {
+    const nextStatus = currentStatus === "approved" ? "suspended" : "approved";
+    try {
+      await API.put(`/stores/admin/${id}/status`, { status: nextStatus });
+      setToast({ type: "success", message: `Store status changed to ${nextStatus}` });
+      fetchStores();
+    } catch (err) {
+      setToast({ type: "error", message: "Failed to update store status" });
+    }
+  };
 
   // Fetch admin accounts
   const fetchAdmins = async () => {
@@ -83,6 +110,7 @@ const SuperAdminDashboard = () => {
     if (activeTab === "admins") fetchAdmins();
     else if (activeTab === "settings") fetchSettings();
     else if (activeTab === "logs") fetchLogs();
+    else if (activeTab === "stores") fetchStores();
   }, [activeTab]);
 
   // Admin account CRUD handlers
@@ -155,19 +183,20 @@ const SuperAdminDashboard = () => {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-      {/* Sidebar Control Panel */}
-      <div className="lg:col-span-1 bg-slate-900 text-white rounded-3xl p-6 shadow-sm h-fit space-y-6">
-        <div className="flex flex-col items-center text-center pb-6 border-b border-slate-800">
-          <div className="w-14 h-14 bg-amber-500/10 text-[#F59E0B] border border-amber-500/20 rounded-full flex items-center justify-center font-black text-2xl shadow-sm mb-3">
+      {/* Sidebar Control Panel - Clean Light Theme */}
+      <div className="lg:col-span-1 bg-white border border-gray-200 text-slate-700 rounded-3xl p-6 shadow-sm h-fit space-y-6">
+        <div className="flex flex-col items-center text-center pb-6 border-b border-gray-150">
+          <div className="w-14 h-14 bg-amber-50 text-[#F59E0B] border border-amber-200 rounded-full flex items-center justify-center font-black text-2xl shadow-sm mb-3">
             <ShieldAlert className="w-7 h-7" />
           </div>
-          <h2 className="font-bold text-sm tracking-wide">Root Control Hub</h2>
-          <p className="text-[10px] text-amber-500 font-bold uppercase tracking-wider mt-0.5">Super Admin Gate</p>
+          <h2 className="font-bold text-sm text-[#1E293B] tracking-wide">Root Control Hub</h2>
+          <p className="text-[10px] text-amber-600 font-bold uppercase tracking-wider mt-0.5">Super Admin Gate</p>
         </div>
 
         <nav className="flex flex-col gap-1.5">
           {[
             { id: "admins", label: "Admin Accounts", icon: <Users className="w-4.5 h-4.5" /> },
+            { id: "stores", label: "Partner Stores", icon: <Store className="w-4.5 h-4.5" /> },
             { id: "settings", label: "System Configs", icon: <Settings className="w-4.5 h-4.5" /> },
             { id: "logs", label: "Audit Command Log", icon: <Terminal className="w-4.5 h-4.5" /> }
           ].map((tab) => (
@@ -176,8 +205,8 @@ const SuperAdminDashboard = () => {
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-xs font-bold text-left transition ${
                 activeTab === tab.id
-                  ? "bg-[#F59E0B] text-white"
-                  : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                  ? "bg-[#F59E0B] text-white shadow-sm"
+                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
               }`}
             >
               {tab.icon}
@@ -186,7 +215,7 @@ const SuperAdminDashboard = () => {
           ))}
           <button
             onClick={logout}
-            className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-xs font-bold text-left text-red-400 hover:bg-red-950/20 transition border-t border-slate-800 mt-4"
+            className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-xs font-bold text-left text-red-600 hover:bg-red-50 transition border-t border-gray-150 mt-4 pt-4"
           >
             Sign Out
           </button>
@@ -266,6 +295,120 @@ const SuperAdminDashboard = () => {
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Partner Stores Management Tab */}
+        {activeTab === "stores" && (
+          <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+            <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-50">
+              <div>
+                <h3 className="text-lg font-bold text-[#1E293B] flex items-center gap-2">
+                  <Store className="w-5 h-5 text-[#F59E0B]" />
+                  <span>3rd Party Partner Stores ({stores.length})</span>
+                </h3>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  Manage vendor stores, view their products count, and toggle approval status.
+                </p>
+              </div>
+            </div>
+
+            {loadingStores ? (
+              <div className="flex justify-center py-12">
+                <div className="w-8 h-8 border-3 border-amber-500 border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : stores.length === 0 ? (
+              <div className="text-center py-12 text-gray-400 text-sm">
+                <Store className="w-12 h-12 text-gray-200 mx-auto mb-2" />
+                No partner stores registered yet. They will appear here when sellers onboard via footer link.
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-gray-50 text-gray-500 uppercase tracking-wider font-bold">
+                    <tr>
+                      <th className="py-3 px-4">Store</th>
+                      <th className="py-3 px-4">Owner Contact</th>
+                      <th className="py-3 px-4">City / Category</th>
+                      <th className="py-3 px-4">Products</th>
+                      <th className="py-3 px-4">Status</th>
+                      <th className="py-3 px-4 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {stores.map((st) => (
+                      <tr key={st._id} className="hover:bg-gray-50/60 transition">
+                        <td className="py-3 px-4">
+                          <div className="flex items-center gap-3">
+                            <img
+                              src={st.logo || "https://images.unsplash.com/photo-1578916171728-46686eac8d58?w=100"}
+                              alt={st.name}
+                              className="w-10 h-10 rounded-xl object-cover border border-gray-200"
+                            />
+                            <div>
+                              <p className="font-bold text-slate-800 text-sm">{st.name}</p>
+                              <Link
+                                to={`/store/${st.slug}`}
+                                target="_blank"
+                                className="text-[11px] text-emerald-600 font-mono hover:underline flex items-center gap-1"
+                              >
+                                /store/{st.slug} <ExternalLink className="w-3 h-3" />
+                              </Link>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="py-3 px-4">
+                          <p className="font-semibold text-slate-700">{st.owner?.name || "Partner"}</p>
+                          <p className="text-gray-400 font-mono text-[11px]">{st.owner?.mobileNumber || st.phone}</p>
+                        </td>
+                        <td className="py-3 px-4">
+                          <p className="font-medium text-slate-700">{st.address?.city || "Tamil Nadu"}</p>
+                          <p className="text-[11px] text-gray-400">{st.category}</p>
+                        </td>
+                        <td className="py-3 px-4">
+                          <span className="font-bold text-slate-800 bg-slate-100 px-2 py-0.5 rounded">
+                            {st.productCount || 0} items
+                          </span>
+                        </td>
+                        <td className="py-3 px-4">
+                          <span
+                            className={`px-2 py-0.5 rounded-full font-bold text-[10px] uppercase ${
+                              st.status === "approved"
+                                ? "bg-emerald-100 text-emerald-800"
+                                : "bg-red-100 text-red-800"
+                            }`}
+                          >
+                            {st.status}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4 text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            <Link
+                              to={`/store/${st.slug}`}
+                              target="_blank"
+                              className="p-1.5 text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 rounded transition"
+                              title="Preview Storefront"
+                            >
+                              <ExternalLink className="w-4 h-4" />
+                            </Link>
+                            <button
+                              onClick={() => handleToggleStoreStatus(st._id, st.status)}
+                              className={`px-2.5 py-1 rounded text-[11px] font-bold transition ${
+                                st.status === "approved"
+                                  ? "bg-amber-50 text-amber-700 hover:bg-amber-100"
+                                  : "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                              }`}
+                            >
+                              {st.status === "approved" ? "Suspend" : "Approve"}
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}

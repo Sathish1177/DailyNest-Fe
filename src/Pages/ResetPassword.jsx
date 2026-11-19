@@ -4,6 +4,7 @@ import { AuthContext } from "../context/AuthContext";
 import Button from "../components/Button";
 import InputBox from "../components/InputBox";
 import Toast from "../components/Toast";
+import Logo from "../components/Logo";
 
 const ResetPassword = () => {
   const { resetPassword } = useContext(AuthContext);
@@ -56,12 +57,9 @@ const ResetPassword = () => {
       )}
 
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <Link to="/" className="inline-flex items-center gap-1.5 focus:outline-none mb-6">
-          <span className="bg-[#2E7D32] text-white font-black px-2.5 py-1.5 rounded-lg text-lg tracking-wider">DN</span>
-          <span className="text-xl font-bold text-[#1E293B] tracking-tight">
-            Daily<span className="text-[#2E7D32]">Nest</span>
-          </span>
-        </Link>
+        <div className="flex justify-center mb-6">
+          <Logo size="lg" />
+        </div>
         <h2 className="text-3xl font-extrabold text-[#1E293B]">Reset Password</h2>
         <p className="mt-2 text-sm text-gray-500">
           Enter the security token and set your new account password.

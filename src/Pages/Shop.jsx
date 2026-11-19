@@ -333,10 +333,20 @@ const Shop = () => {
                           />
                         </div>
 
-                        {/* Brand badge */}
-                        <span className="text-[9px] bg-slate-100 text-slate-500 font-bold px-2 py-0.5 rounded uppercase">
-                          {prod.brand}
-                        </span>
+                        {/* Brand badge / Store badge */}
+                        {prod.store ? (
+                          <Link
+                            to={`/store/${prod.store.slug}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-[9px] bg-emerald-50 text-emerald-800 hover:bg-emerald-100 font-bold px-2 py-0.5 rounded uppercase inline-flex items-center gap-1 border border-emerald-200 transition"
+                          >
+                            <span>🏪 {prod.store.name}</span>
+                          </Link>
+                        ) : (
+                          <span className="text-[9px] bg-slate-100 text-slate-500 font-bold px-2 py-0.5 rounded uppercase">
+                            {prod.brand}
+                          </span>
+                        )}
 
                         {/* Name */}
                         <h4

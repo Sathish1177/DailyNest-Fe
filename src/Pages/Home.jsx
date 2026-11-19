@@ -751,6 +751,56 @@ const Home = () => {
         </div>
       </section>
 
+      {/* DailyNest Store Partner Program Feature Banner */}
+      <section className="max-w-7xl mx-auto px-4 md:px-8 pt-12">
+        <div className="bg-white border border-gray-200 rounded-3xl p-8 sm:p-12 shadow-sm">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            <div className="lg:col-span-8">
+              <p className="text-xs font-bold uppercase tracking-wider text-[#2E7D32] mb-2">
+                DailyNest Store Partner Program
+              </p>
+              <h2 className="text-2xl sm:text-3xl font-black text-[#1E293B] tracking-tight mb-3">
+                Start Selling & Get Your <span className="text-[#2E7D32]">Own Branded Store</span> Page!
+              </h2>
+              <p className="text-slate-600 text-sm leading-relaxed max-w-2xl mb-6">
+                Sell your products to DailyNest shoppers while having your very own dedicated storefront URL (e.g. <span className="font-mono text-xs bg-slate-100 text-emerald-800 px-2 py-0.5 rounded font-semibold">/store/your-shop</span>) to share directly with your customers on WhatsApp & Instagram.
+              </p>
+
+              {/* Quick Perks */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="p-3 bg-slate-50 border border-gray-200 rounded-xl text-xs font-bold text-slate-700">
+                  ✓ Zero Setup Fee & Quick Onboarding
+                </div>
+                <div className="p-3 bg-slate-50 border border-gray-200 rounded-xl text-xs font-bold text-slate-700">
+                  ✓ Branded Storefront + DailyNest Market
+                </div>
+                <div className="p-3 bg-slate-50 border border-gray-200 rounded-xl text-xs font-bold text-slate-700">
+                  ✓ Dedicated Store Admin Dashboard
+                </div>
+              </div>
+            </div>
+
+            <div className="lg:col-span-4 flex flex-col sm:flex-row lg:flex-col justify-center gap-3">
+              <Button
+                onClick={() => navigate("/register-store")}
+                variant="primary"
+                className="w-full py-3.5 text-sm font-bold shadow-sm flex items-center justify-center gap-2"
+              >
+                <span>Register Your Store</span>
+                <ArrowRight className="w-4 h-4" />
+              </Button>
+              <Button
+                onClick={() => navigate("/adminlogin")}
+                variant="outline"
+                className="w-full py-3.5 text-sm font-bold bg-white"
+              >
+                Partner & Admin Login
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Testimonials */}
       <section className="max-w-7xl mx-auto px-4 md:px-8 py-20">
         <div className="text-center mb-12">
@@ -779,31 +829,27 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Newsletter Subscription Section */}
-      <section className="bg-slate-900 border-t border-slate-800 text-white py-16 relative overflow-hidden">
-        {/* Subtle decorative background lights */}
-        <div className="absolute top-0 left-1/4 w-80 h-80 bg-emerald-500/10 rounded-full blur-[120px] pointer-events-none"></div>
-        <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-amber-500/5 rounded-full blur-[120px] pointer-events-none"></div>
-
+      {/* Newsletter Subscription Section - Light Clean Style */}
+      <section className="bg-[#F8FAFC] border-t border-gray-200 py-16 relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 md:px-8 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             
             {/* Heading text */}
             <div className="lg:col-span-7 space-y-4">
-              <div className="inline-flex items-center gap-2 bg-emerald-950/60 border border-emerald-800/40 px-3 py-1 rounded-full text-emerald-400 text-xs font-bold">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-[#2E7D32] text-xs font-bold uppercase tracking-wider">
                 <Mail className="w-3.5 h-3.5" />
                 <span>Stay Updated Daily</span>
               </div>
-              <h2 className="text-3xl md:text-4xl font-black tracking-tight leading-tight">
+              <h2 className="text-3xl md:text-4xl font-black text-[#1E293B] tracking-tight leading-tight">
                 Subscribe to DailyNest Newsletter
               </h2>
-              <p className="text-slate-400 text-sm max-w-xl">
-                Be the first to receive updates on organic arrivals, special deals, health tips, and local coupons. Get a <strong className="text-emerald-400">10% discount coupon</strong> instantly upon joining!
+              <p className="text-slate-600 text-sm max-w-xl leading-relaxed">
+                Be the first to receive updates on organic arrivals, special deals, health tips, and local coupons. Get a <strong className="text-[#2E7D32]">10% discount coupon</strong> instantly upon joining!
               </p>
             </div>
 
-            {/* Input signup form */}
-            <div className="lg:col-span-5 bg-slate-800/20 border border-slate-800 p-6 rounded-3xl backdrop-blur-md">
+            {/* Input signup form card */}
+            <div className="lg:col-span-5 bg-white border border-gray-200 p-6 sm:p-8 rounded-3xl shadow-sm">
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -825,19 +871,19 @@ const Home = () => {
                     name="newsletterEmail"
                     required
                     placeholder="Enter your email address"
-                    className="w-full bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 focus:outline-none rounded-2xl px-5 py-4 text-sm text-slate-200 transition-all duration-200 pl-11"
+                    className="w-full bg-[#F8FAFC] border border-gray-200 hover:border-gray-300 focus:border-[#2E7D32] focus:ring-1 focus:ring-[#2E7D32] focus:outline-none rounded-2xl px-5 py-3.5 text-sm text-slate-800 placeholder-slate-400 transition-all duration-200 pl-11"
                   />
-                  <Mail className="w-4 h-4 text-slate-500 absolute left-4 top-1/2 -translate-y-1/2" />
+                  <Mail className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
                 </div>
                 <Button
                   type="submit"
                   variant="primary"
-                  className="w-full py-4 text-sm font-bold bg-emerald-600 hover:bg-emerald-500 rounded-2xl tracking-wide shadow-lg shadow-emerald-900/20 transform hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 border-0"
+                  className="w-full py-3.5 text-sm font-bold bg-[#2E7D32] hover:bg-[#256428] text-white rounded-2xl tracking-wide shadow-md transition-all duration-200 border-0"
                 >
                   Join DailyNest Club
                 </Button>
               </form>
-              <div className="flex justify-between items-center text-[10px] text-slate-500 font-bold mt-4 px-2 uppercase tracking-wide">
+              <div className="flex justify-between items-center text-[10px] text-slate-400 font-bold mt-4 px-2 uppercase tracking-wide">
                 <span>🛡️ Spam-Free Policy</span>
                 <span>Unsubscribe anytime</span>
               </div>

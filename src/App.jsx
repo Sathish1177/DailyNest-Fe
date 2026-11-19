@@ -21,6 +21,9 @@ import Contact from "./Pages/Contact";
 import DashboardIndex from "./Pages/Dashboard";
 import DNsuperadminPage from "./Pages/Dashboard/DNsuperadminPage";
 import DNAdminPage from "./Pages/Dashboard/DNAdminPage";
+import RegisterStore from "./Pages/RegisterStore";
+import StoreAdminDashboard from "./Pages/Dashboard/StoreAdminDashboard";
+import StoreFront from "./Pages/StoreFront";
 
 function App() {
   return (
@@ -55,6 +58,11 @@ function App() {
             <Route path="/dashboard" element={<DashboardIndex />} />
             <Route path="/DNsuperadmin" element={<DNsuperadminPage />} />
             <Route path="/DNAdmin" element={<DNAdminPage />} />
+
+            {/* Store Partner Multi-Vendor System */}
+            <Route path="/register-store" element={<RegisterStore />} />
+            <Route path="/store-dashboard" element={<StoreAdminDashboard />} />
+            <Route path="/store/:slug" element={<StoreFront />} />
           </Routes>
         </BrowserRouter>
       </CartProvider>

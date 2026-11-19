@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { Star, ShoppingCart, Heart, ShieldCheck, ChevronRight, Check, Bell } from "lucide-react";
+import { Star, ShoppingCart, Heart, ShieldCheck, ChevronRight, Check, Bell, Store } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import Button from "../components/Button";
@@ -218,6 +218,19 @@ const ProductDetail = () => {
                 <span className="text-gray-300">•</span>
                 <span className="text-gray-500">{product.category?.name}</span>
               </div>
+
+              {product.store && (
+                <div className="mb-2">
+                  <Link
+                    to={`/store/${product.store.slug}`}
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3 py-1 rounded-lg transition"
+                  >
+                    <Store className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Sold by: {product.store.name}</span>
+                    <span className="text-[10px] text-emerald-600 underline ml-1">Visit Store ↗</span>
+                  </Link>
+                </div>
+              )}
 
               {/* Title */}
               <h1 className="text-3xl font-black text-[#1E293B] mt-2.5 leading-tight tracking-tight">

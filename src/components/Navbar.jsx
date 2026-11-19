@@ -4,6 +4,7 @@ import { Search, ShoppingCart, Heart, User, LogOut, LayoutDashboard, Menu, X, Ch
 import { AuthContext } from "../context/AuthContext";
 import { CartContext } from "../context/CartContext";
 import API from "../utils/api";
+import Logo from "./Logo";
 
 const Navbar = () => {
   const { user, logout } = useContext(AuthContext);
@@ -54,12 +55,7 @@ const Navbar = () => {
       {/* Main Bar */}
       <div className="max-w-7xl mx-auto px-4 md:px-8 py-4 flex items-center justify-between gap-4">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-1.5 focus:outline-none">
-          <span className="bg-[#2E7D32] text-white font-black px-2.5 py-1.5 rounded-lg text-lg tracking-wider">DN</span>
-          <span className="text-xl font-bold text-[#1E293B] tracking-tight">
-            Daily<span className="text-[#2E7D32]">Nest</span>
-          </span>
-        </Link>
+        <Logo size="md" />
 
         {/* Search Bar */}
         <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-lg relative">
@@ -117,7 +113,16 @@ const Navbar = () => {
                     ROLE: <span className="text-[#2E7D32] font-bold uppercase">{user.role}</span>
                   </div>
 
-                  {user.role === "customer" ? (
+                  {user.role === "store-admin" ? (
+                    <Link
+                      to="/store-dashboard"
+                      onClick={() => setIsProfileOpen(false)}
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-[#1e293b] hover:bg-emerald-50 hover:text-[#2E7D32] font-semibold transition"
+                    >
+                      <LayoutDashboard className="w-4.5 h-4.5 text-[#2E7D32]" />
+                      Store Dashboard
+                    </Link>
+                  ) : user.role === "customer" ? (
                     <Link
                       to="/dashboard"
                       onClick={() => setIsProfileOpen(false)}

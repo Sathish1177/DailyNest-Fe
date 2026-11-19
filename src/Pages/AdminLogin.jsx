@@ -4,6 +4,7 @@ import { AuthContext } from "../context/AuthContext";
 import Button from "../components/Button";
 import InputBox from "../components/InputBox";
 import Toast from "../components/Toast";
+import Logo from "../components/Logo";
 import { ShieldAlert, ShieldCheck } from "lucide-react";
 
 const AdminLogin = () => {
@@ -34,6 +35,9 @@ const AdminLogin = () => {
       } else if (role === "admin") {
         setToast({ type: "success", message: `Welcome Back, ${res.user.name || "Admin"}!` });
         setTimeout(() => navigate("/DNAdmin"), 1000);
+      } else if (role === "store-admin") {
+        setToast({ type: "success", message: `Welcome to Store Portal, ${res.user.name || "Store Partner"}!` });
+        setTimeout(() => navigate("/store-dashboard"), 1000);
       } else {
         // Disallowed role: log them out immediately to clean storage
         logout();
@@ -54,19 +58,14 @@ const AdminLogin = () => {
       )}
 
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <Link to="/" className="inline-flex items-center gap-1.5 focus:outline-none mb-6">
-          <span className="bg-[#1E293B] text-white font-black px-2.5 py-1.5 rounded-lg text-lg tracking-wider flex items-center gap-1">
-            <ShieldCheck className="w-5 h-5 text-emerald-400" />
-          </span>
-          <span className="text-xl font-bold text-[#1E293B] tracking-tight">
-            Daily<span className="text-[#2E7D32]">Nest</span> <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 bg-slate-100 px-2 py-0.5 rounded ml-1">Portal</span>
-          </span>
-        </Link>
+        <div className="flex justify-center mb-6">
+          <Logo size="lg" />
+        </div>
         <h2 className="text-3xl font-extrabold text-[#1E293B]">Admin Console Login</h2>
         <p className="mt-2 text-sm text-gray-500">
-          Authorized personnel access only. Customers please login{" "}
-          <Link to="/login" className="font-semibold text-[#2E7D32] hover:text-[#256428]">
-            here
+          Authorized personnel & store partners access only. Want to sell on DailyNest?{" "}
+          <Link to="/register-store" className="font-semibold text-[#2E7D32] hover:text-[#256428] underline">
+            Register Store
           </Link>
         </p>
       </div>
