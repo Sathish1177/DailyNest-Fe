@@ -453,7 +453,7 @@ const CustomerDashboard = () => {
                           prod.images && prod.images[0]
                             ? prod.images[0].startsWith("http")
                               ? prod.images[0]
-                              : `http://localhost:8000${prod.images[0]}`
+                              : `https://dailynest-be.onrender.com${prod.images[0]}`
                             : "https://images.unsplash.com/photo-1542838132-92c53300491e?w=500&auto=format&fit=crop&q=60"
                         }
                         alt={prod.name}

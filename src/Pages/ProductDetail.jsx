@@ -61,7 +61,7 @@ const ProductDetail = () => {
       try {
         const { data } = await API.get(`/products/${id}`);
         if (data.images && data.images.length > 0) {
-          data.images = data.images.map(img => img && !img.startsWith("http") ? `http://localhost:8000${img}` : img);
+          data.images = data.images.map(img => img && !img.startsWith("http") ? `https://dailynest-be.onrender.com${img}` : img);
         }
         setProduct(data);
         setActiveImage(data.images?.[0] || "");
@@ -79,7 +79,7 @@ const ProductDetail = () => {
         const related = relRes.data.products.filter((p) => p._id !== data._id);
         const mappedRelated = related.map(p => {
           if (p.images && p.images.length > 0) {
-            p.images = p.images.map(img => img && !img.startsWith("http") ? `http://localhost:8000${img}` : img);
+            p.images = p.images.map(img => img && !img.startsWith("http") ? `https://dailynest-be.onrender.com${img}` : img);
           }
           return p;
         });

@@ -354,7 +354,7 @@ const Checkout = () => {
                           item.image
                             ? item.image.startsWith("http")
                               ? item.image
-                              : `http://localhost:8000${item.image}`
+                              : `https://dailynest-be.onrender.com${item.image}`
                             : "https://images.unsplash.com/photo-1542838132-92c53300491e?w=500&auto=format&fit=crop&q=60"
                         }
                         alt={item.name}

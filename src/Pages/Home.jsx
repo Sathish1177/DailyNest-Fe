@@ -9,6 +9,8 @@ import Modal from "../components/Modal";
 import InputBox from "../components/InputBox";
 import API from "../utils/api";
 import { CartContext } from "../context/CartContext";
+import heroBannerImg from "../assets/hero-banner.jpg";
+import brandLogo from "../assets/logo/Dailynest Fresh Grocery Logo.png";
 
 const Home = () => {
   const { addToCart, toggleWishlist, isInWishlist } = useContext(CartContext);
@@ -61,7 +63,7 @@ const Home = () => {
         const bannerRes = await API.get("/banners");
         const mappedBanners = bannerRes.data.map(b => ({
           ...b,
-          image: b.image ? (b.image.startsWith("http") ? b.image : `http://localhost:8000${b.image}`) : ""
+          image: b.image ? (b.image.startsWith("http") ? b.image : `https://dailynest-be.onrender.com${b.image}`) : ""
         }));
         const heroBanners = mappedBanners.filter(b => b.type === "Hero" || !b.type);
         setBanners(heroBanners);
@@ -70,7 +72,7 @@ const Home = () => {
         const catRes = await API.get("/categories?activeOnly=true");
         const mappedCategories = catRes.data.map(cat => ({
           ...cat,
-          image: cat.image ? (cat.image.startsWith("http") ? cat.image : `http://localhost:8000${cat.image}`) : ""
+          image: cat.image ? (cat.image.startsWith("http") ? cat.image : `https://dailynest-be.onrender.com${cat.image}`) : ""
         }));
         setCategories(mappedCategories);
 
@@ -82,7 +84,7 @@ const Home = () => {
         const prodRes = await API.get("/products?isActive=true&limit=20");
         const mappedProds = prodRes.data.products.map(prod => {
           if (prod.images && prod.images.length > 0) {
-            prod.images = prod.images.map(img => img && !img.startsWith("http") ? `http://localhost:8000${img}` : img);
+            prod.images = prod.images.map(img => img && !img.startsWith("http") ? `https://dailynest-be.onrender.com${img}` : img);
           }
           return prod;
         });
@@ -92,7 +94,7 @@ const Home = () => {
         const csRes = await API.get("/products?isComingSoon=true&limit=4");
         const mappedCS = csRes.data.products.map(prod => {
           if (prod.images && prod.images.length > 0) {
-            prod.images = prod.images.map(img => img && !img.startsWith("http") ? `http://localhost:8000${img}` : img);
+            prod.images = prod.images.map(img => img && !img.startsWith("http") ? `https://dailynest-be.onrender.com${img}` : img);
           }
           return prod;
         });
@@ -292,18 +294,35 @@ const Home = () => {
             <div
               className="h-full w-full bg-cover bg-center flex items-center px-8 md:px-16"
               style={{
-                backgroundImage: banners[activeBannerIdx].image
-                  ? `linear-gradient(to right, rgba(15,23,42,0.85), rgba(15,23,42,0.3)), url(${banners[activeBannerIdx].image})`
-                  : `linear-gradient(to right, rgba(15,23,42,0.95), rgba(15,23,42,0.5)), url('https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1200')`
+                backgroundImage: banners[activeBannerIdx]?.image
+                  ? `linear-gradient(to right, rgba(15,23,42,0.85), rgba(15,23,42,0.3)), url(${
+                      banners[activeBannerIdx].image === "/uploads/hero-banner.jpg"
+                        ? heroBannerImg
+                        : banners[activeBannerIdx].image.startsWith("http")
+                        ? banners[activeBannerIdx].image
+                        : `https://dailynest-be.onrender.com${banners[activeBannerIdx].image}`
+                    })`
+                  : `linear-gradient(to right, rgba(15,23,42,0.85), rgba(15,23,42,0.3)), url(${heroBannerImg})`
               }}
             >
-              <div className="max-w-2xl text-white space-y-6">
-                <span className="bg-[#F59E0B] text-slate-900 font-extrabold text-xs px-3.5 py-1.5 rounded-full uppercase tracking-wider">
-                  TODAY'S SPECIAL FLASH DEAL
-                </span>
-                <h1 className="text-4xl md:text-6xl font-black leading-tight tracking-tight">
-                  {banners[activeBannerIdx].title}
-                </h1>
+              <div className="max-w-2xl text-white space-y-5">
+                {/* Brand Logo inside Hero Banner */}
+                <div className="inline-flex items-center bg-white/95 backdrop-blur-md px-3.5 py-1.5 rounded-2xl shadow-lg border border-white/50">
+                  <img
+                    src={brandLogo}
+                    alt="DailyNest"
+                    className="h-9 sm:h-11 w-auto object-contain"
+                  />
+                </div>
+
+                <div>
+                  <span className="bg-[#F59E0B] text-slate-900 font-extrabold text-xs px-3.5 py-1.5 rounded-full uppercase tracking-wider inline-block mb-3">
+                    TODAY'S SPECIAL FLASH DEAL
+                  </span>
+                  <h1 className="text-4xl md:text-6xl font-black leading-tight tracking-tight">
+                    {banners[activeBannerIdx].title}
+                  </h1>
+                </div>
                 <p className="text-slate-300 text-lg">
                   {banners[activeBannerIdx].description}
                 </p>

@@ -1,7 +1,9 @@
 import axios from "axios";
 
+export const BASE_URL = import.meta.env.VITE_BACKEND_URL || "https://dailynest-be.onrender.com";
+
 const API = axios.create({
-  baseURL: "http://localhost:8000/api",
+  baseURL: import.meta.env.VITE_API_URL || `${BASE_URL}/api`,
   timeout: 30000,
   headers: {
     "Content-Type": "application/json"

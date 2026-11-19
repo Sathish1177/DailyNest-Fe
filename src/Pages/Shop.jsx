@@ -104,7 +104,7 @@ const Shop = () => {
         const { data } = await API.get("/products", { params });
         const mappedProducts = data.products.map(prod => {
           if (prod.images && prod.images.length > 0) {
-            prod.images = prod.images.map(img => img && !img.startsWith("http") ? `http://localhost:8000${img}` : img);
+            prod.images = prod.images.map(img => img && !img.startsWith("http") ? `https://dailynest-be.onrender.com${img}` : img);
           }
           return prod;
         });
